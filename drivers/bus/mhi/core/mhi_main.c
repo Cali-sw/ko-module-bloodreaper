@@ -2220,7 +2220,6 @@ int mhi_debugfs_mhi_regdump_show(struct seq_file *m, void *d)
 int mhi_debugfs_mhi_states_show(struct seq_file *m, void *d)
 {
 	struct mhi_controller *mhi_cntrl = m->private;
-	struct mhi_link_info *cur_info = &mhi_cntrl->mhi_link_info;
 
 	seq_printf(m,
 		   "[%llu ns]: pm_state:%s dev_state:%s EE:%s M0:%u M2:%u M3:%u M3_Fast:%u wake:%d ignore_override:%d dev_wake:%u alloc_size:%u pending_pkts:%u last_requested_bw:GEN%dx%d\n",
