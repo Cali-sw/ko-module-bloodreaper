@@ -19,9 +19,10 @@ jobs:
 
     - name: Prepare module build environment
       run: |
-        # This generates the necessary .mod.c files for module building
-        make pipa_defconfig ARCH=arm64
-        make modules_prepare ARCH=arm64
+        # Use the existing pipa_defconfig to create the .config file
+        make pipa_defconfig ARCH=arm64 CC=clang-14 HOSTCC=clang-14
+        # FORCE the use of clang for modules_prepare
+        make modules_prepare ARCH=arm64 CC=clang-14 HOSTCC=clang-14
 
     - name: Android kernel build
       uses: lemniskett/android-kernel-actions@master
