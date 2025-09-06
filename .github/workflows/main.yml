@@ -2,7 +2,7 @@ name: Kernel Build
 
 on:
   workflow_dispatch:
-
+  push:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,7 +23,7 @@ jobs:
         arch: arm64
         defconfig: pipa_defconfig
         image: Image.gz-dtb
-        compiler: clang/17 # Example: gcc-13, gcc-12, etc.
+        compiler: clang/14 # Example: gcc-13, gcc-12, etc.
 
     - name: Upload Kernel and Module
       uses: actions/upload-artifact@v4
