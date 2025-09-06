@@ -3,6 +3,7 @@ name: Kernel Build
 on:
   workflow_dispatch:
   push:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,6 +17,12 @@ jobs:
       run: |
         curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s M dogi
 
+    - name: Prepare module build environment
+      run: |
+        # This generates the necessary .mod.c files for module building
+        make pipa_defconfig ARCH=arm64
+        make modules_prepare ARCH=arm64
+
     - name: Android kernel build
       uses: lemniskett/android-kernel-actions@master
       id: build
@@ -23,7 +30,7 @@ jobs:
         arch: arm64
         defconfig: pipa_defconfig
         image: Image.gz-dtb
-        compiler: clang/14 # Example: gcc-13, gcc-12, etc.
+        compiler: clang/14
 
     - name: Upload Kernel and Module
       uses: actions/upload-artifact@v4
