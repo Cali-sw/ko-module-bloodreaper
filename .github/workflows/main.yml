@@ -1,42 +1,32 @@
 name: Kernel Build
-
 on:
   workflow_dispatch:
-  push:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout kernel source
       uses: actions/checkout@v4
-      with:
-        submodules: recursive
-
-    - name: Set up MemKernel as a module (M-OUT) with specified name
+      
+    - name: Set up MemKernel as a module (M) with specified name
       run: |
         curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s M dogi
-
-    - name: Prepare module build environment
-      run: |
-        # Use the existing pipa_defconfig to create the .config file
-        make pipa_defconfig ARCH=arm64 CC=clang-14 HOSTCC=clang/14
-        # FORCE the use of clang for modules_prepare
-        make modules_prepare ARCH=arm64 CC=clang-14 HOSTCC=clang/14
-
+        
     - name: Android kernel build
       uses: lemniskett/android-kernel-actions@master
       id: build
+      env:
+        NAME: Loganysl
       with:
         arch: arm64
+        compiler: clang/15
         defconfig: pipa_defconfig
         image: Image.gz-dtb
-        compiler: clang/14
-
+        
     - name: Upload Kernel and Module
       uses: actions/upload-artifact@v4
       with:
-        name: module
+        name: moduleandkernel
         path: |
           ${{ steps.build.outputs.outfile }}
-          ./out/drivers/memkernel/memkernel.ko
+          ./out/drivers/memkernel/dogi_memk.ko
