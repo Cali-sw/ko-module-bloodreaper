@@ -10,7 +10,9 @@ jobs:
       
     - name: Set up MemKernel as a module (M) with specified name
       run: |
-        curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s M dogi
+        # Use the setup.sh script that's in the kernel repository
+        chmod +x ./setup.sh
+        ./setup.sh M dogi
         
     - name: Android kernel build
       uses: lemniskett/android-kernel-actions@master
@@ -19,7 +21,7 @@ jobs:
         NAME: Loganysl
       with:
         arch: arm64
-        compiler: clang/15
+        compiler: clang/14
         defconfig: pipa_defconfig
         image: Image.gz-dtb
         
