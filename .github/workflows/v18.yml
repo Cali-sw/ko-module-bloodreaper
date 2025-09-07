@@ -1,0 +1,18 @@
+	git config --global --add safe.directory /github/workspace
+branch/tag: 
+make options: ARCH=arm64 SUBARCH=arm64 CC=clang LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf LLVM_IAS=1 HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar
+==> Generating defconfig from `make pipa_defconfig`...
+make[1]: Entering directory '/github/workspace/out'
+  HOSTCC  scripts/basic/fixdep
+  GEN     ./Makefile
+  HOSTCC  scripts/kconfig/conf.o
+  YACC    scripts/kconfig/zconf.tab.c
+  LEX     scripts/kconfig/zconf.lex.c
+  HOSTCC  scripts/kconfig/zconf.tab.o
+  HOSTLD  scripts/kconfig/conf
+drivers/Kconfig:241: can't open file "drivers/memkernel/Kconfig"
+make[2]: *** [../scripts/kconfig/Makefile:104: pipa_defconfig] Error 1
+make[1]: *** [/github/workspace/Makefile:562: pipa_defconfig] Error 2
+make[1]: Leaving directory '/github/workspace/out'
+make: *** [Makefile:153: sub-make] Error 2
+==> Failed generating .config, make sure it is actually available in arch/arm64/configs/ and is a valid defconfig file
