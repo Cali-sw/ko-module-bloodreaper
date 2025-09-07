@@ -31,9 +31,20 @@ jobs:
         
         echo "[+] Using driver directory: $DRIVER_DIR"
         
-        # Create symlink
+        # Create symlink and verify it works
         ln -sf "$(pwd)/MemKernel/kernel" "$DRIVER_DIR/memkernel"
         echo "[+] Created symlink: $DRIVER_DIR/memkernel -> $(pwd)/MemKernel/kernel"
+        
+        # Verify symlink and files exist
+        if [ -f "$DRIVER_DIR/memkernel/Kconfig" ]; then
+          echo "[+] MemKernel Kconfig found successfully"
+          ls -la "$DRIVER_DIR/memkernel/"
+        else
+          echo "[ERROR] MemKernel Kconfig not found after symlink creation"
+          echo "Checking what's in MemKernel/kernel:"
+          ls -la "MemKernel/kernel/"
+          exit 1
+        fi
         
         # Modify Makefile if not already done
         if ! grep -q "memkernel" "$DRIVER_DIR/Makefile"; then
