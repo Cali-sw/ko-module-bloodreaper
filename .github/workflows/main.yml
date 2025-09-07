@@ -32,9 +32,8 @@ jobs:
         echo "[+] Using driver directory: $DRIVER_DIR"
         
         # Create symlink
-        cd "$DRIVER_DIR"
-        ln -sf "$(realpath --relative-to="$DRIVER_DIR" "../MemKernel/kernel")" "memkernel"
-        cd ..
+        ln -sf "$(pwd)/MemKernel/kernel" "$DRIVER_DIR/memkernel"
+        echo "[+] Created symlink: $DRIVER_DIR/memkernel -> $(pwd)/MemKernel/kernel"
         
         # Modify Makefile if not already done
         if ! grep -q "memkernel" "$DRIVER_DIR/Makefile"; then
