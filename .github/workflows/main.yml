@@ -1,4 +1,4 @@
-name: Kernel Build
+name: Kernel Build Test
 on:
   workflow_dispatch:
 jobs:
@@ -7,18 +7,12 @@ jobs:
     steps:
     - name: Checkout kernel source
       uses: actions/checkout@v4
-      
     - name: Fix git ownership issues
-      run: |
-        git config --global --add safe.directory /github/workspace
-        git config --global --add safe.directory '*'
-        
-    - name: Test step before MemKernel
-      run: echo "About to run MemKernel setup"
-      
-    - name: Set up MemKernel as a module
-      run: echo "MemKernel setup started" && git clone https://github.com/Poko-Apps/MemKernel && echo "MemKernel cloned" && ln -sf "$(pwd)/MemKernel/kernel" "drivers/memkernel" && echo "Symlink created" && echo "source \"drivers/memkernel/Kconfig\"" >> "drivers/Kconfig" && echo "obj-m += memkernel/" >> "drivers/Makefile" && sed -i 's/default y/default m/' "MemKernel/kernel/Kconfig" && sed -i "s/#define DEVICE_NAME \".*\"/#define DEVICE_NAME \"dogi\"/" "MemKernel/kernel/entry.c" && sed -i "s/memkernel.o/dogi_memk.o/" "MemKernel/kernel/Makefile" && sed -i "s/memkernel-y/dogi_memk-y/" "MemKernel/kernel/Makefile" && echo "MemKernel setup complete"
-        
+      run: git config --global --add safe.directory /github/workspace
+    - name: TEST STEP
+      run: echo "THIS STEP SHOULD APPEAR IN LOGS"
+    - name: MemKernel setup
+      run: echo "MemKernel step started" && git clone https://github.com/Poko-Apps/MemKernel && ln -sf "$(pwd)/MemKernel/kernel" "drivers/memkernel" && echo "source \"drivers/memkernel/Kconfig\"" >> "drivers/Kconfig" && echo "obj-m += memkernel/" >> "drivers/Makefile" && echo "MemKernel setup done"
     - name: Android kernel build
       uses: lemniskett/android-kernel-actions@master
       id: build
@@ -29,11 +23,10 @@ jobs:
         compiler: clang/14
         defconfig: pipa_defconfig
         image: Image.gz-dtb
-        
     - name: Upload Kernel and Module
       uses: actions/upload-artifact@v4
       with:
         name: moduleandkernel
         path: |
           ${{ steps.build.outputs.outfile }}
-          ./out/drivers/memkernel/dogi_memk.ko
+          ./out/drivers/memkernel/memkernel.ko
