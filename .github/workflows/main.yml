@@ -13,48 +13,11 @@ jobs:
         git config --global --add safe.directory /github/workspace
         git config --global --add safe.directory '*'
         
+    - name: Test step before MemKernel
+      run: echo "About to run MemKernel setup"
+      
     - name: Set up MemKernel as a module
-      run: |
-        echo "[+] Starting MemKernel setup..."
-        git clone https://github.com/Poko-Apps/MemKernel
-        echo "[+] MemKernel cloned"
-        
-        DRIVER_DIR="drivers"
-        echo "[+] Using driver directory: $DRIVER_DIR"
-        
-        # Clean existing references
-        if [ -f "$DRIVER_DIR/Kconfig" ]; then
-          sed -i '/drivers\/memkernel\/Kconfig/d' "$DRIVER_DIR/Kconfig"
-        fi
-        if [ -f "$DRIVER_DIR/Makefile" ]; then
-          sed -i '/memkernel/d' "$DRIVER_DIR/Makefile" 
-        fi
-        if [ -L "$DRIVER_DIR/memkernel" ]; then
-          rm "$DRIVER_DIR/memkernel"
-        fi
-        
-        # Create symlink
-        ln -sf "$(pwd)/MemKernel/kernel" "$DRIVER_DIR/memkernel"
-        
-        # Verify
-        if [ -f "$DRIVER_DIR/memkernel/Kconfig" ]; then
-          echo "[+] MemKernel files accessible"
-        else
-          echo "[ERROR] MemKernel setup failed"
-          exit 1
-        fi
-        
-        # Add to build system
-        echo "source \"drivers/memkernel/Kconfig\"" >> "$DRIVER_DIR/Kconfig"
-        echo "obj-m += memkernel/" >> "$DRIVER_DIR/Makefile"
-        
-        # Customize module
-        sed -i 's/default y/default m/' "MemKernel/kernel/Kconfig"
-        sed -i "s/#define DEVICE_NAME \".*\"/#define DEVICE_NAME \"dogi\"/" "MemKernel/kernel/entry.c"
-        sed -i "s/memkernel.o/dogi_memk.o/" "MemKernel/kernel/Makefile"
-        sed -i "s/memkernel-y/dogi_memk-y/" "MemKernel/kernel/Makefile"
-        
-        echo "[+] MemKernel setup complete"
+      run: echo "MemKernel setup started" && git clone https://github.com/Poko-Apps/MemKernel && echo "MemKernel cloned" && ln -sf "$(pwd)/MemKernel/kernel" "drivers/memkernel" && echo "Symlink created" && echo "source \"drivers/memkernel/Kconfig\"" >> "drivers/Kconfig" && echo "obj-m += memkernel/" >> "drivers/Makefile" && sed -i 's/default y/default m/' "MemKernel/kernel/Kconfig" && sed -i "s/#define DEVICE_NAME \".*\"/#define DEVICE_NAME \"dogi\"/" "MemKernel/kernel/entry.c" && sed -i "s/memkernel.o/dogi_memk.o/" "MemKernel/kernel/Makefile" && sed -i "s/memkernel-y/dogi_memk-y/" "MemKernel/kernel/Makefile" && echo "MemKernel setup complete"
         
     - name: Android kernel build
       uses: lemniskett/android-kernel-actions@master
