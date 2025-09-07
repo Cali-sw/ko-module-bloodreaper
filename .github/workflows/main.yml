@@ -1,4 +1,70 @@
-name: Kernel Build
+- name: Set up MemKernel as a module (M) with specified name
+      run: |
+        set -e  # Exit on any error
+        echo "[+] Starting MemKernel setup..."
+        
+        # Add git safe directory
+        git config --global --add safe.directory /github/workspace
+        
+        # Manual MemKernel setup to ensure it works properly
+        echo "[+] Setting up MemKernel manually..."
+        
+        # Clone MemKernel repository
+        echo "[+] Cloning MemKernel repository..."
+        git clone https://github.com/Poko-Apps/MemKernel
+        cd MemKernel
+        git checkout main
+        echo "[+] MemKernel cloned successfully"
+        ls -la
+        cd ..
+        
+        # Determine drivers directory
+        if [ -d "common/drivers" ]; then
+          DRIVER_DIR="common/drivers"
+        elif [ -d "drivers" ]; then
+          DRIVER_DIR="drivers"
+        else
+          echo "[ERROR] No drivers directory found"
+          ls -la
+          exit 1
+        fi
+        
+        echo "[+] Using driver directory: $DRIVER_DIR"
+        
+        # Clean up any existing memkernel references first
+        if [ -L "$DRIVER_DIR/memkernel" ]; then
+          rm "$DRIVER_DIR/memkernel"
+          echo "[+] Removed existing memkernel symlink"
+        fi
+        
+        if grep -q "memkernel" "$DRIVER_DIR/Makefile"; then
+          sed -i '/memkernel/d' "$DRIVER_DIR/Makefile"
+          echo "[+] Cleaned existing memkernel from Makefile"
+        fi
+        
+        if grep -q "drivers/memkernel/Kconfig" "$DRIVER_DIR/Kconfig"; then
+          sed -i '/drivers\/memkernel\/Kconfig/d' "$DRIVER_DIR/Kconfig"
+          echo "[+] Cleaned existing memkernel from Kconfig"
+        fi
+        
+        # Create symlink and verify it works
+        ln -sf "$(pwd)/MemKernel/kernel" "$DRIVER_DIR/memkernel"
+        echo "[+] Created symlink: $DRIVER_DIR/memkernel -> $(pwd)/MemKernel/kernel"
+        
+        # Verify symlink and files exist
+        if [ -f "$DRIVER_DIR/memkernel/Kconfig" ]; then
+          echo "[+] MemKernel Kconfig found successfully"
+          ls -la "$DRIVER_DIR/memkernel/"
+        else
+          echo "[ERROR] MemKernel Kconfig not found after symlink creation"
+          echo "Checking what's in MemKernel/kernel:"
+          ls -la "MemKernel/kernel/"
+          exit 1
+        fi
+        
+        # Modify Makefile if not already done
+        if ! grep -q "memkernel" "$DRIVER_DIR/Makefile"; then
+          echo "obj-m += memkernel/" >> "$DRIVER_DIR/Makefilename: Kernel Build
 on:
   workflow_dispatch:
 jobs:
