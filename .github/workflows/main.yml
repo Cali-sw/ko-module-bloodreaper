@@ -8,39 +8,21 @@ jobs:
     - name: Checkout kernel source
       uses: actions/checkout@v4
       
-    - name: Debug workflow version
-      run: |
-        echo "=== WORKFLOW DEBUG INFO ==="
-        echo "Timestamp: $(date)"
-        echo "Current directory: $(pwd)"
-        echo "Directory contents:"
-        ls -la
-        echo "========================="
-        
     - name: Fix git ownership issues
       run: |
         git config --global --add safe.directory /github/workspace
         git config --global --add safe.directory '*'
         
-    - name: Set up MemKernel as a module (M) with specified name
+    - name: Set up MemKernel as a module
       run: |
         echo "[+] Starting MemKernel setup..."
-        
-        # Clone MemKernel repository
         git clone https://github.com/Poko-Apps/MemKernel
         echo "[+] MemKernel cloned"
         
-        # Determine drivers directory
-        if [ -d "drivers" ]; then
-          DRIVER_DIR="drivers"
-        else
-          echo "[ERROR] drivers directory not found"
-          exit 1
-        fi
-        
+        DRIVER_DIR="drivers"
         echo "[+] Using driver directory: $DRIVER_DIR"
         
-        # Clean up any existing references
+        # Clean existing references
         if [ -f "$DRIVER_DIR/Kconfig" ]; then
           sed -i '/drivers\/memkernel\/Kconfig/d' "$DRIVER_DIR/Kconfig"
         fi
@@ -62,7 +44,7 @@ jobs:
           exit 1
         fi
         
-        # Add to Kconfig and Makefile
+        # Add to build system
         echo "source \"drivers/memkernel/Kconfig\"" >> "$DRIVER_DIR/Kconfig"
         echo "obj-m += memkernel/" >> "$DRIVER_DIR/Makefile"
         
