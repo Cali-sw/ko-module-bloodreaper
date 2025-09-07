@@ -8,6 +8,15 @@ jobs:
     - name: Checkout kernel source
       uses: actions/checkout@v4
       
+    - name: Debug workflow version
+      run: |
+        echo "=== WORKFLOW DEBUG INFO ==="
+        echo "Timestamp: $(date)"
+        echo "Current directory: $(pwd)"
+        echo "Directory contents:"
+        ls -la
+        echo "========================="
+        
     - name: Fix git ownership issues
       run: |
         git config --global --add safe.directory /github/workspace
